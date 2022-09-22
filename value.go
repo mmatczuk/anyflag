@@ -31,7 +31,7 @@ func (v *Value[T]) Type() string {
 }
 
 func (v *Value[T]) String() string {
-	if v.value == nil || reflect.ValueOf(*v.value).IsNil() {
+	if v.value == nil || reflect.ValueOf(*v.value).IsZero() {
 		return ""
 	}
 	return (*v.value).String()
