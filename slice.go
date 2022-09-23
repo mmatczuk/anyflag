@@ -7,14 +7,14 @@ import (
 )
 
 // SliceValue is a generic pflag.SliceValue for a slice of T.
-type SliceValue[T fmt.Stringer] struct {
+type SliceValue[T any] struct {
 	parse   func(val string) (T, error)
 	value   *[]T
 	changed bool
 }
 
 // NewSliceValue returns a new SliceValue[T] with the given value, pointer to a slice of T, and a parse function.
-func NewSliceValue[T fmt.Stringer](val []T, p *[]T, parse func(val string) (T, error)) *SliceValue[T] {
+func NewSliceValue[T any](val []T, p *[]T, parse func(val string) (T, error)) *SliceValue[T] {
 	sv := new(SliceValue[T])
 	sv.parse = parse
 	sv.value = p
@@ -49,7 +49,7 @@ func (s *SliceValue[T]) Type() string {
 func (s *SliceValue[T]) String() string {
 	out := make([]string, len(*s.value))
 	for i, d := range *s.value {
-		out[i] = fmt.Sprintf("%s", d)
+		out[i] = fmt.Sprint(d)
 	}
 	return "[" + strings.Join(out, ",") + "]"
 }
@@ -59,7 +59,7 @@ func (s *SliceValue[T]) fromString(val string) (T, error) {
 }
 
 func (s *SliceValue[T]) toString(val T) string {
-	return fmt.Sprintf("%s", val)
+	return fmt.Sprint(val)
 }
 
 func (s *SliceValue[T]) Append(val string) error {
