@@ -3,8 +3,8 @@
 [![Build Status](https://github.com/mmatczuk/anyflag/actions/workflows/go.yml/badge.svg)](https://github.com/mmatczuk/anyflag/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mmatczuk/anyflag)](https://goreportcard.com/report/github.com/mmatczuk/anyflag)
 
-Anyflag is implementation of [Cobra](https://github.com/spf13/cobra) `Value` and `SliceValue` interfaces using Go Generics.
-It allows you to use any type as a flag value.
+Anyflag is implementation of [Cobra](https://github.com/spf13/cobra) `pflag.Value` and `pflag.SliceValue` interfaces using Go Generics.
+To bind your custom type to a flag, all you have to do is specify the value type and parser function, and you are done, no boilerplate.  
 
 ## Installation
 
