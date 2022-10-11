@@ -5,6 +5,18 @@ import (
 	"strings"
 )
 
+// EnumParser returns parse function for string based enums.
+func EnumParser[T fmt.Stringer](all ...T) func(val string) (T, error) {
+	return func(val string) (T, error) {
+		for _, s := range all {
+			if strings.EqualFold(s.String(), val) {
+				return s, nil
+			}
+		}
+		return all[0], fmt.Errorf("invalid value: %q", val)
+	}
+}
+
 type ints interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
 }
