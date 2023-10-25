@@ -21,6 +21,15 @@ func setUpDSFlagSetWithDefault(dsp *[]time.Duration) *pflag.FlagSet {
 	return f
 }
 
+func setUpDSFlagSetWithRedact(dsp *[]time.Duration) *pflag.FlagSet {
+	r := func(d time.Duration) string {
+		return d.Round(10 * time.Minute).String()
+	}
+	f := pflag.NewFlagSet("test", pflag.ContinueOnError)
+	f.VarP(NewSliceValueWithRedact[time.Duration]([]time.Duration{}, dsp, time.ParseDuration, r), "ds", "", "Command separated list!")
+	return f
+}
+
 func TestEmptyDS(t *testing.T) {
 	var ds []time.Duration
 	f := setUpDSFlagSet(&ds)
@@ -94,6 +103,26 @@ func TestDSWithDefault(t *testing.T) {
 		if d != v {
 			t.Fatalf("expected ds[%d] to be %d but got: %d", i, d, v)
 		}
+	}
+}
+
+func TestDSWithRedact(t *testing.T) {
+	var ds []time.Duration
+	f := setUpDSFlagSetWithRedact(&ds)
+
+	vals := []string{"1ns", "2ms", "3m", "4h"}
+	arg := fmt.Sprintf("--ds=%s", strings.Join(vals, ","))
+	err := f.Parse([]string{arg})
+	if err != nil {
+		t.Fatal("expected no error; got", err)
+	}
+
+	v := f.Lookup("ds").Value
+	if v.String() != "[0s,0s,0s,4h0m0s]" {
+		t.Fatal("expected redacted; got", v.String())
+	}
+	if s := v.(*SliceValue[time.Duration]); strings.Join(s.GetSlice(), ",") != "0s,0s,0s,4h0m0s" {
+		t.Fatal("expected redacted; got", s.GetSlice())
 	}
 }
 
