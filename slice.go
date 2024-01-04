@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"encoding/csv"
 
 	"github.com/spf13/pflag"
 )
@@ -45,7 +46,12 @@ func (s *SliceValue[T]) Unredacted() pflag.Value {
 }
 
 func (s *SliceValue[T]) Set(val string) error {
-	ss := strings.Split(val, ",")
+	r := strings.NewReader(val)
+	cr := csv.NewReader(r)
+	ss, err := cr.Read()
+	if err != nil {
+		return err
+	}
 	out := make([]T, len(ss))
 	for i, d := range ss {
 		var err error

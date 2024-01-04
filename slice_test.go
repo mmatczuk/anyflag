@@ -30,6 +30,12 @@ func setUpDSFlagSetWithRedact(dsp *[]time.Duration) *pflag.FlagSet {
 	return f
 }
 
+func setUpSSFlagSet(ssp *[]string) *pflag.FlagSet {
+	f := pflag.NewFlagSet("test", pflag.ContinueOnError)
+	f.StringSliceVar(ssp, "ss", []string{}, "Command separated list!")
+	return f
+}
+
 func TestEmptyDS(t *testing.T) {
 	var ds []time.Duration
 	f := setUpDSFlagSet(&ds)
@@ -166,5 +172,28 @@ func TestDSCalledTwice(t *testing.T) {
 		if expected[i] != v {
 			t.Fatalf("expected ds[%d] to be %d but got: %d", i, expected[i], v)
 		}
+	}
+}
+
+func TestWithCommas(t *testing.T) {
+	var ss []string
+
+	f := setUpSSFlagSet(&ss)
+	in := []string{`"foo=1,2"`, `"bar=3"`}
+	expected := []string{"foo=1,2", "bar=3"}
+	argfmt := "--ss=%s"
+	arg1 := fmt.Sprintf(argfmt, in[0])
+	arg2 := fmt.Sprintf(argfmt, in[1])
+	err := f.Parse([]string{arg1, arg2})
+	if err != nil {
+		t.Fatal("expected no error; got", err)
+
+	}
+	for i, v := range ss {
+		if expected[i] != v {
+			t.Fatalf("expected ss[%d] to be %s but got: %s", i, expected[i], v)
+
+		}
+
 	}
 }
