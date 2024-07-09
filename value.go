@@ -56,9 +56,22 @@ func (v *Value[T]) String() string {
 	if v.redact != nil {
 		return v.redact(*v.value)
 	}
-
-	if v.value == nil || reflect.ValueOf(*v.value).IsZero() {
+	if v.value == nil {
 		return ""
 	}
-	return fmt.Sprint(*v.value)
+	vv := reflect.ValueOf(v.value)
+	if vv.IsZero() || reflect.Indirect(vv).IsZero() {
+		return ""
+	}
+
+	s := fmt.Sprint(*v.value)
+	// If there is a nil pointer under the hood, the output still may be "<nil>".
+	// Example
+	// var v = &net.IP{}
+	// fmt.Sprint(*v) // "<nil>"
+	if s == "<nil>" {
+		return ""
+	}
+
+	return s
 }

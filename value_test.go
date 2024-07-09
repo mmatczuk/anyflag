@@ -2,6 +2,7 @@ package anyflag
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"strings"
@@ -67,4 +68,27 @@ func TestIP(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestEmptyValueString(t *testing.T) {
+	t.Run("net.IP", func(t *testing.T) {
+		var ip net.IP
+		if s := NewValue[net.IP](net.IP{}, &ip, parseIP).String(); s != "" {
+			t.Errorf("expected empty string, got %q", s)
+		}
+	})
+
+	t.Run("io.Writer", func(t *testing.T) {
+		var w io.Writer
+		if s := NewValue[io.Writer](w, &w, nil).String(); s != "" {
+			t.Errorf("expected empty string, got %q", s)
+		}
+	})
+
+	t.Run("os.File ptr", func(t *testing.T) {
+		var f *os.File
+		if s := NewValue[*os.File](f, &f, nil).String(); s != "" {
+			t.Errorf("expected empty string, got %q", s)
+		}
+	})
 }
